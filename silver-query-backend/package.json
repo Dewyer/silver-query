@@ -1,0 +1,20 @@
+{
+  "name": "camdistance-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Dewyer",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "compile": "tsc",
+    "debug": "yarn compile&&node ./dist/index.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.15",
+    "@types/node-fetch": "^2.5.4"
+  }
+}
