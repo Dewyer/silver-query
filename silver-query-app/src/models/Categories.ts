@@ -1,6 +1,6 @@
 import { Category } from "./Category";
 
-export interface Categories
+export interface CategoriesCollection
 {
 	flat:Category[ ],
 	graph:Category[ ]

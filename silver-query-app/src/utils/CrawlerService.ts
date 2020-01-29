@@ -2,8 +2,11 @@ import parse5 from "parse5";
 import cheerio from "cheerio";
 import { Category } from "../models/Category";
 import { Product } from "../models/Product";
-import { Categories } from "../models/Categories";
+import { CategoriesCollection } from "../models/Categories";
 import uuid from "uuid";
+import { ProductsCollection } from "../models/ProductsCollection";
+import { CrawlProgress } from "../models/CrawlProgress";
+import DataRepository from "./DataRepository";
 
 export interface HtmlObj
 {
@@ -33,7 +36,7 @@ export default abstract class CrawlerService
 		return null;
 	}
 
-	public static async crawlCategories() : Promise<Categories>
+	public static async crawlCategories() : Promise<CategoriesCollection>
 	{
 		let resHtml = await this.fetchHtmlWithProxy(this.SILVERLAND);
 		if (resHtml)
@@ -93,18 +96,85 @@ export default abstract class CrawlerService
 
 	public static async crawlProduct(productEl:CheerioElement) : Promise<Product | null>
 	{
+		let href = this.getProductHrefFromListElement(productEl);
+		let productHtml = await this.fetchHtmlWithProxy(href);
+
+		if (productHtml)
+		{
+			let DD = cheerio.load(productHtml);
+			let prod:Product = {
+				title:"",
+				priceHuf:0,
+				productNumber:0,
+				category:"",
+				description:"",
+				stockState:"other"
+			};
+			DD("#body>h2>em").each((ii,doc)=>{
+				if (prod.title === "")
+				{
+					prod.title = doc.children[0].data ? doc.children[0].data : "";
+					prod.title = prod.title.trim();
+					prod.title = prod.title.substring(0, prod.title.length-2);
+				}
+			});
+
+			DD("#body>div>p").each((ii,doc)=>{
+				let fieldName = doc.children[0].data ? doc.children[0].data : "";
+				let fieldVal = "";
+				if (doc.children.length >= 2)
+				{
+					if (doc.children[1].children.length > 0)
+						if (doc.children[1].children[0].data)
+							fieldVal = doc.children[1].children[0].data;
+				}
+
+				if (fieldName.startsWith("Ár"))
+				{
+					prod.priceHuf = parseInt(fieldVal.trim().substring(0,fieldVal.length-2));
+				}
+
+				if (fieldName.startsWith("Szállítás"))
+				{
+					if (fieldVal === "Raktárról")
+					{
+						prod.stockState = "in-stock";
+					}
+					else if (fieldVal === "Csak rendelésre")
+					{
+						prod.stockState = "order-only";
+					}
+				}
+
+				if (fieldName.startsWith("Termékszám"))
+				{
+					prod.productNumber= parseInt(fieldName.split(":")[1].trim());
+				}
+			});
+			let desc = DD("#body>div>p>span").first().html();
+			if (desc)
+			{
+				prod.description = desc;
+			}
+			//console.log(prod);
+			return prod;
+		}
+
+		return null;
+	}
+
+	public static getProductHrefFromListElement(productEl: CheerioElement) : string
+	{
 		let href = "";
-		productEl.children.forEach(xx=>{
+		productEl.children.forEach(xx =>
+		{
 			if (xx.attribs)
 				if (xx.attribs["class"] === "more")
 				{
 					href = xx.children[1].attribs["href"];
 				}
 		})
-
-		console.log("prod href: ",href);
-
-		return null;
+		return href;
 	}
 
 	public static isNoProductErrorPage(dd:CheerioStatic) : boolean
@@ -168,17 +238,29 @@ export default abstract class CrawlerService
 
 	public static async doCrawl()
 	{
-		let res = await this.crawlCategories();
-		await this.sleep(1000);
-		for (let ii = 0; ii < res.flat.length;ii++)
+		let categoriesCol = await this.crawlCategories();
+		DataRepository.saveCategories(categoriesCol);
+
+		let productsCol:ProductsCollection = DataRepository.getProductsCollection();
+		let progress = DataRepository.getCrawlProgress();
+
+		for (let ii = progress.atCatIndex; ii < categoriesCol.flat.length;ii++)
 		{
-			let thisCat = res.flat[ii];
-			console.log(thisCat.name)
+			let thisCat = categoriesCol.flat[ii];
+			console.log(thisCat.name, " at cat ",ii," / ",categoriesCol.flat.length);
 			if (thisCat.productsLink !== "#")
 			{
-				let products = await this.crawlProducts(res.flat[ii].productsLink);
+				let productsInThisCat = await this.crawlProducts(categoriesCol.flat[ii].productsLink);
+				productsInThisCat.forEach(xx=>xx.category = thisCat.id);
+				productsCol.byCategory[thisCat.id] = productsInThisCat;
 			}
+			DataRepository.saveProducts(productsCol);
+			progress.atCatIndex = ii+1;
+			DataRepository.saveCrawlProgress(progress);
 		}
+
+		DataRepository.saveProducts(productsCol);
+		console.log("saved everything");
 	}
 
 	public static sleep(ms:number):Promise<void>

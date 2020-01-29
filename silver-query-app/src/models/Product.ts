@@ -5,5 +5,6 @@ export interface Product
 	category:string,
 	productNumber:number,
 	priceHuf:number,
-	description:string
+	description:string,
+	stockState:"in-stock"|"order-only"|"other"
 }
