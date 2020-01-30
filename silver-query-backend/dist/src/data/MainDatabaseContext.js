@@ -1,4 +1,13 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,18 +48,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var CrawlerService_1 = __importDefault(require("./services/CrawlerService"));
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, CrawlerService_1.default.doCrawl()];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
+var tsyringe_1 = require("tsyringe");
+var mongoose_1 = __importDefault(require("mongoose"));
+var ConfigurationService_1 = __importDefault(require("../services/ConfigurationService"));
+var MainDatabaseContext = /** @class */ (function () {
+    function MainDatabaseContext() {
+        this._config = tsyringe_1.container.resolve(ConfigurationService_1.default).getConfiguration();
+    }
+    MainDatabaseContext.prototype.initDb = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var ex_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, mongoose_1.default.connect(this._config.dbConString, { useNewUrlParser: true, useUnifiedTopology: true })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, true];
+                    case 2:
+                        ex_1 = _a.sent();
+                        console.log(ex_1);
+                        return [2 /*return*/, false];
+                    case 3: return [2 /*return*/];
+                }
+            });
         });
-    });
-}
-main();
-//# sourceMappingURL=index.js.map
+    };
+    MainDatabaseContext = __decorate([
+        tsyringe_1.singleton(),
+        __metadata("design:paramtypes", [])
+    ], MainDatabaseContext);
+    return MainDatabaseContext;
+}());
+exports.default = MainDatabaseContext;
+//# sourceMappingURL=MainDatabaseContext.js.map

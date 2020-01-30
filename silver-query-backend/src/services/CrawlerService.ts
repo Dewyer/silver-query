@@ -1,21 +1,30 @@
 import cheerio from "cheerio";
-import { Category } from "../models/Category";
+import { ICategory } from "../models/Category";
 import { Product } from "../models/Product";
 import { CategoriesCollection } from "../models/Categories";
 import uuid from "uuid";
 import { ProductsCollection } from "../models/ProductsCollection";
 import { CrawlProgress } from "../models/CrawlProgress";
-import DataRepository from "./DataRepository";
 import fetch from "node-fetch";
+import {singleton, container} from "tsyringe";
+import CategoryRepository from "../repositories/CategoryRepository";
 
-export default abstract class CrawlerService
+@singleton()
+export default class CrawlerService
 {
 
-	static PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-	static SILVERLAND = "http://www.silverland.hu";
-	static ERROR_MSG = "Nincs megjeleníthető termék.";
+	PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+	SILVERLAND = "http://www.silverland.hu";
+	ERROR_MSG = "Nincs megjeleníthető termék.";
 
-	public static async fetchHtmlWithProxy(site:string) : Promise<string | null>
+	_categoryRepository:CategoryRepository;
+
+	constructor()
+	{
+		this._categoryRepository = container.resolve(CategoryRepository);
+	}
+
+	public async fetchHtmlWithProxy(site:string) : Promise<string | null>
 	{
 		let res = await fetch(`${encodeURI(site)}`,{
 			method:"GET"
@@ -29,22 +38,22 @@ export default abstract class CrawlerService
 		return null;
 	}
 
-	public static async crawlCategories() : Promise<CategoriesCollection>
+	public async crawlCategories() : Promise<CategoriesCollection>
 	{
 		let resHtml = await this.fetchHtmlWithProxy(this.SILVERLAND);
 		if (resHtml)
 		{
 			let DD = cheerio.load(resHtml);
 			let levels = [".menulist>li>a", ".menulist>li>ul>li>a", ".menulist>li>ul>li>ul>li>a"];
-			let cats:Category[ ] = [ ];
-			let flat:Category[ ] = [ ];
+			let cats:ICategory[ ] = [ ];
+			let flat:ICategory[ ] = [ ];
 
 			levels.forEach((level,levInd)=>
 			{
 				DD(level).each((ii,doc)=>{
 					let name = doc.childNodes[0].data!;
 					let id = doc.attribs["href"];
-					let cat:Category = {
+					let cat:ICategory = {
 						name:name,
 						id:uuid.v4(),
 						subCategories:[ ],
@@ -87,7 +96,7 @@ export default abstract class CrawlerService
 		return {flat:[ ],graph:[ ]};
 	}
 
-	public static async crawlProduct(productEl:CheerioElement) : Promise<Product | null>
+	public async crawlProduct(productEl:CheerioElement) : Promise<Product | null>
 	{
 		let href = this.getProductHrefFromListElement(productEl);
 		let productHtml = await this.fetchHtmlWithProxy(href);
@@ -101,7 +110,8 @@ export default abstract class CrawlerService
 				productNumber:0,
 				category:"",
 				description:"",
-				stockState:"other"
+				stockState:"other",
+				silverUrl:encodeURI(href)
 			};
 			DD("#body>h2>em").each((ii,doc)=>{
 				if (prod.title === "")
@@ -156,7 +166,7 @@ export default abstract class CrawlerService
 		return null;
 	}
 
-	public static getProductHrefFromListElement(productEl: CheerioElement) : string
+	public getProductHrefFromListElement(productEl: CheerioElement) : string
 	{
 		let href = "";
 		productEl.children.forEach(xx =>
@@ -170,7 +180,7 @@ export default abstract class CrawlerService
 		return href;
 	}
 
-	public static isNoProductErrorPage(dd:CheerioStatic) : boolean
+	public isNoProductErrorPage(dd:CheerioStatic) : boolean
 	{
 		let found = false;
 		dd("#body>p").each((ii,doc)=>{
@@ -187,7 +197,7 @@ export default abstract class CrawlerService
 		return found;
 	}
 
-	public static async crawlProducts(subSite:string) : Promise<Product[ ]>
+	public async crawlProducts(subSite:string) : Promise<Product[ ]>
 	{
 		console.log("getting products for: ",subSite);
 		let prods:Product[ ] = [ ];
@@ -229,7 +239,7 @@ export default abstract class CrawlerService
 		return [ ];
 	}
 
-	public static async doCrawl()
+	public async doCrawl()
 	{
 		console.log("Start crawl.")
 		let categoriesCol = await this.crawlCategories();
@@ -257,7 +267,7 @@ export default abstract class CrawlerService
 		console.log("saved everything");
 	}
 
-	public static sleep(ms:number):Promise<void>
+	private sleep(ms:number):Promise<void>
 	{
 		return new Promise((a,b)=>{setTimeout(()=>{a()},ms)})
 	}

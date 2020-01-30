@@ -6,5 +6,6 @@ export interface Product
 	productNumber:number,
 	priceHuf:number,
 	description:string,
-	stockState:"in-stock"|"order-only"|"other"
+	stockState:"in-stock"|"order-only"|"other",
+	silverUrl:string
 }

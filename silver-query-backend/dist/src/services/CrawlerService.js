@@ -1,4 +1,10 @@
 "use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -43,10 +49,14 @@ var cheerio_1 = __importDefault(require("cheerio"));
 var uuid_1 = __importDefault(require("uuid"));
 var DataRepository_1 = __importDefault(require("./DataRepository"));
 var node_fetch_1 = __importDefault(require("node-fetch"));
+var tsyringe_1 = require("tsyringe");
 var CrawlerService = /** @class */ (function () {
     function CrawlerService() {
+        this.PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+        this.SILVERLAND = "http://www.silverland.hu";
+        this.ERROR_MSG = "Nincs megjeleníthető termék.";
     }
-    CrawlerService.fetchHtmlWithProxy = function (site) {
+    CrawlerService.prototype.fetchHtmlWithProxy = function (site) {
         return __awaiter(this, void 0, void 0, function () {
             var res, tt;
             return __generator(this, function (_a) {
@@ -66,7 +76,7 @@ var CrawlerService = /** @class */ (function () {
             });
         });
     };
-    CrawlerService.crawlCategories = function () {
+    CrawlerService.prototype.crawlCategories = function () {
         return __awaiter(this, void 0, void 0, function () {
             var resHtml, DD_1, levels, cats_1, flat_1;
             return __generator(this, function (_a) {
@@ -120,7 +130,7 @@ var CrawlerService = /** @class */ (function () {
             });
         });
     };
-    CrawlerService.crawlProduct = function (productEl) {
+    CrawlerService.prototype.crawlProduct = function (productEl) {
         return __awaiter(this, void 0, void 0, function () {
             var href, productHtml, DD, prod_1, desc;
             return __generator(this, function (_a) {
@@ -138,7 +148,8 @@ var CrawlerService = /** @class */ (function () {
                                 productNumber: 0,
                                 category: "",
                                 description: "",
-                                stockState: "other"
+                                stockState: "other",
+                                silverUrl: encodeURI(href)
                             };
                             DD("#body>h2>em").each(function (ii, doc) {
                                 if (prod_1.title === "") {
@@ -182,7 +193,7 @@ var CrawlerService = /** @class */ (function () {
             });
         });
     };
-    CrawlerService.getProductHrefFromListElement = function (productEl) {
+    CrawlerService.prototype.getProductHrefFromListElement = function (productEl) {
         var href = "";
         productEl.children.forEach(function (xx) {
             if (xx.attribs)
@@ -192,7 +203,7 @@ var CrawlerService = /** @class */ (function () {
         });
         return href;
     };
-    CrawlerService.isNoProductErrorPage = function (dd) {
+    CrawlerService.prototype.isNoProductErrorPage = function (dd) {
         var _this = this;
         var found = false;
         dd("#body>p").each(function (ii, doc) {
@@ -205,7 +216,7 @@ var CrawlerService = /** @class */ (function () {
         });
         return found;
     };
-    CrawlerService.crawlProducts = function (subSite) {
+    CrawlerService.prototype.crawlProducts = function (subSite) {
         return __awaiter(this, void 0, void 0, function () {
             var prods, atPage, _loop_1, this_1, state_1;
             return __generator(this, function (_a) {
@@ -270,7 +281,7 @@ var CrawlerService = /** @class */ (function () {
             });
         });
     };
-    CrawlerService.doCrawl = function () {
+    CrawlerService.prototype.doCrawl = function () {
         return __awaiter(this, void 0, void 0, function () {
             var categoriesCol, productsCol, progress, _loop_2, this_2, ii;
             return __generator(this, function (_a) {
@@ -325,12 +336,12 @@ var CrawlerService = /** @class */ (function () {
             });
         });
     };
-    CrawlerService.sleep = function (ms) {
+    CrawlerService.prototype.sleep = function (ms) {
         return new Promise(function (a, b) { setTimeout(function () { a(); }, ms); });
     };
-    CrawlerService.PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-    CrawlerService.SILVERLAND = "http://www.silverland.hu";
-    CrawlerService.ERROR_MSG = "Nincs megjeleníthető termék.";
+    CrawlerService = __decorate([
+        tsyringe_1.singleton()
+    ], CrawlerService);
     return CrawlerService;
 }());
 exports.default = CrawlerService;

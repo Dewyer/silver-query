@@ -1,8 +1,12 @@
+import "reflect-metadata";
+
 import CrawlerService from "./services/CrawlerService";
+import { container } from "tsyringe";
 
 async function main()
 {
-    await CrawlerService.doCrawl();
+    let crawler = container.resolve(CrawlerService);
+    await crawler.doCrawl();
 }
 
 main();

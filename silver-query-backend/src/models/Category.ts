@@ -1,8 +1,8 @@
 
-export interface Category
+export interface ICategory
 {
 	name:string,
-	subCategories:Category[ ],
+	subCategories:ICategory[ ],
 	id:string,
 	productsLink:string
 }

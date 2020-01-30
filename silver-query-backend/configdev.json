@@ -1,0 +1,4 @@
+//This file should be named config.json to become the active configuration file
+{
+    "dbConString":"<mongo db con string here>"
+}

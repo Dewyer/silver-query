@@ -7,14 +7,20 @@
   "private": true,
   "scripts": {
     "compile": "tsc",
-    "debug": "yarn compile&&node ./dist/index.js"
+    "debug": "yarn compile&&node ./dist/src/index.js"
   },
   "dependencies": {
+    "@types/reflect-metadata": "^0.1.0",
     "cheerio": "^1.0.0-rc.3",
-    "node-fetch": "^2.6.0"
+    "mongoose": "^5.8.10",
+    "node-fetch": "^2.6.0",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.0.1",
+    "typegoose": "^5.9.1"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.15",
+    "@types/mongoose": "^5.7.0",
     "@types/node-fetch": "^2.5.4"
   }
 }
