@@ -17,6 +17,7 @@ export default class MainDatabaseContext
     {
         try
         {
+            console.log(this._config.dbConString)
             await mongoose.connect(this._config.dbConString, { useNewUrlParser: true, useUnifiedTopology: true });
             return true;
         }

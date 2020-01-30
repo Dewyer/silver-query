@@ -2,7 +2,7 @@
 export interface ICategory
 {
 	name:string,
-	subCategories:ICategory[ ],
-	id:string,
+	subCategories?:ICategory[ ],
+	_id:string,
 	productsLink:string
 }

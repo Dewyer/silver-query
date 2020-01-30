@@ -1,7 +1,8 @@
 import { ICategory } from "./Category";
+import { Category } from "./database/CategoryModel";
 
 export interface CategoriesCollection
 {
-	flat:ICategory[ ],
-	graph:ICategory[ ]
+	flat:Category[ ],
+	graph: Category[ ]
 }

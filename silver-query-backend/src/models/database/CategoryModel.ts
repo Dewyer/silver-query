@@ -1,4 +1,4 @@
-import { prop, Typegoose, ModelType, InstanceType, Ref } from 'typegoose';
+import { prop, Typegoose, ModelType, InstanceType, Ref, arrayProp } from '@hasezoey/typegoose';
 import * as mongoose from 'mongoose';
 import { ICategory } from '../Category';
 
@@ -10,7 +10,9 @@ export class Category extends Typegoose
     name!:string;
 
     @prop({ required: true })
-    subCategories!:string[];
+    subCategoriesIds!:string[];
+
+    subCategories?:Category[]
 
     @prop({ required: true })
     productsLink!:string;

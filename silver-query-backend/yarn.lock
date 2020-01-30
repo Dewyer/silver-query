@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@hasezoey/typegoose@^5.9.1":
+  version "5.9.2"
+  resolved "https://registry.yarnpkg.com/@hasezoey/typegoose/-/typegoose-5.9.2.tgz#10e949ba04da61156416448f9d5990794dd15fd3"
+  integrity sha512-PwbOGJi9IggUF8E2K3fEHSEoBgXV3nlDd1H6m/rjC9iWG1GeKHAp9gp0SPZh3e/5rJ3vWbfWbyukD/pMT3tbxA==
+  dependencies:
+    reflect-metadata "^0.1.13"
+
 "@types/bson@*":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/bson/-/bson-4.0.1.tgz#2bfc80819e7055b76d5496d5344ed23e5d12bbb2"
@@ -50,6 +57,11 @@
   integrity sha512-bXltFLY3qhzCnVYP5iUpeSICagQ8rc9K2liS+8M0lBcz54BHs3O6W5UvqespVSuebo1BXLi+/y9ioELAW9SC2A==
   dependencies:
     reflect-metadata "*"
+
+"@types/uuid@^3.4.7":
+  version "3.4.7"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.7.tgz#51d42247473bc00e38cc8dfaf70d936842a36c03"
+  integrity sha512-C2j2FWgQkF1ru12SjZJyMaTPxs/f6n90+5G5qNakBxKXjTBc/YTSelHh4Pz1HUDwxFXD9WvpQhOGCDC+/Y4mIQ==
 
 bluebird@3.5.1:
   version "3.5.1"
@@ -359,14 +371,17 @@ tsyringe@^4.0.1:
   dependencies:
     tslib "^1.9.3"
 
-typegoose@^5.9.1:
-  version "5.9.1"
-  resolved "https://registry.yarnpkg.com/typegoose/-/typegoose-5.9.1.tgz#58dbb14f35ecf96b22e7c744fa7a0f9731260f29"
-  integrity sha512-D+vMhNyZeKBZHrmJFZwOodl3T9W2NOXY+hbnW/f1n60oEL8+L15eryFc9C6fAKrlnkgpui+kdQnNXsLwx2MgCw==
-  dependencies:
-    reflect-metadata "^0.1.13"
+typescript@^3.7.5:
+  version "3.7.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
+  integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
+
+uuid@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
+  integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==

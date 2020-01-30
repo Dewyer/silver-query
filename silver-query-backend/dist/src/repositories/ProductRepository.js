@@ -17,34 +17,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const ProductModel_1 = require("../models/database/ProductModel");
 const tsyringe_1 = require("tsyringe");
-const mongoose_1 = __importDefault(require("mongoose"));
-const ConfigurationService_1 = __importDefault(require("../services/ConfigurationService"));
-let MainDatabaseContext = class MainDatabaseContext {
+let ProductRepository = class ProductRepository {
     constructor() {
-        this._config = tsyringe_1.container.resolve(ConfigurationService_1.default).getConfiguration();
     }
-    initDb() {
+    getProductById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                console.log(this._config.dbConString);
-                yield mongoose_1.default.connect(this._config.dbConString, { useNewUrlParser: true, useUnifiedTopology: true });
-                return true;
+            let res = yield ProductModel_1.ProductModel.findById(id).exec();
+            if (res) {
+                return res;
             }
-            catch (ex) {
-                console.log(ex);
-                return false;
-            }
+            return null;
+        });
+    }
+    addProduct(ent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield ProductModel_1.ProductModel.create(ent);
+            return res != null;
+        });
+    }
+    getAllProducts() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield ProductModel_1.ProductModel.find({});
+            return res;
+        });
+    }
+    bulkAddProduct(cats) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let res = yield ProductModel_1.ProductModel.create(cats);
+            return res != null;
         });
     }
 };
-MainDatabaseContext = __decorate([
-    tsyringe_1.singleton(),
+ProductRepository = __decorate([
+    tsyringe_1.injectable(),
     __metadata("design:paramtypes", [])
-], MainDatabaseContext);
-exports.default = MainDatabaseContext;
-//# sourceMappingURL=MainDatabaseContext.js.map
+], ProductRepository);
+exports.default = ProductRepository;
+//# sourceMappingURL=ProductRepository.js.map

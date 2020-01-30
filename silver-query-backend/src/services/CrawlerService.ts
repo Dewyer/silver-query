@@ -1,13 +1,15 @@
 import cheerio from "cheerio";
 import { ICategory } from "../models/Category";
-import { Product } from "../models/Product";
 import { CategoriesCollection } from "../models/Categories";
 import uuid from "uuid";
-import { ProductsCollection } from "../models/ProductsCollection";
-import { CrawlProgress } from "../models/CrawlProgress";
 import fetch from "node-fetch";
 import {singleton, container} from "tsyringe";
 import CategoryRepository from "../repositories/CategoryRepository";
+import { Category, CategoryModel } from "../models/database/CategoryModel";
+import {Types} from 'mongoose';
+import { Product, ProductModel } from "../models/database/ProductModel";
+import ProductRepository from "../repositories/ProductRepository";
+import CrawlProgressRepository from "../repositories/CrawlProgressRepository";
 
 @singleton()
 export default class CrawlerService
@@ -18,10 +20,14 @@ export default class CrawlerService
 	ERROR_MSG = "Nincs megjeleníthető termék.";
 
 	_categoryRepository:CategoryRepository;
+	_productRepository:ProductRepository;
+	_crawlProgressRepository:CrawlProgressRepository;
 
 	constructor()
 	{
 		this._categoryRepository = container.resolve(CategoryRepository);
+		this._productRepository = container.resolve(ProductRepository);
+		this._crawlProgressRepository = container.resolve(CrawlProgressRepository);
 	}
 
 	public async fetchHtmlWithProxy(site:string) : Promise<string | null>
@@ -45,21 +51,22 @@ export default class CrawlerService
 		{
 			let DD = cheerio.load(resHtml);
 			let levels = [".menulist>li>a", ".menulist>li>ul>li>a", ".menulist>li>ul>li>ul>li>a"];
-			let cats:ICategory[ ] = [ ];
-			let flat:ICategory[ ] = [ ];
+			let cats:Category[ ] = [ ];
+			let flat: Category[ ] = [ ];
 
 			levels.forEach((level,levInd)=>
 			{
 				DD(level).each((ii,doc)=>{
 					let name = doc.childNodes[0].data!;
 					let id = doc.attribs["href"];
-					let cat:ICategory = {
+					let cat: Category = new CategoryModel({
 						name:name,
-						id:uuid.v4(),
-						subCategories:[ ],
-						productsLink:id
-					};
-
+						_id: new Types.ObjectId(),
+						subCategoriesIds:[],
+						productsLink :id
+					});
+					cat.subCategories = [];
+					
 					if (levInd !== 0)
 					{
 						let parent = doc.parent.parent.parent.children[0].children[0].data;
@@ -68,15 +75,15 @@ export default class CrawlerService
 							let parentCat = cats.find(x=>x.name === parent);
 							if (parentCat)
 							{
-								parentCat.subCategories.push(cat);
+								parentCat.subCategories!.push(cat);
 							}
 						}
 						else
 						{
-							let what = cats.map(xx=>xx.subCategories.find(ll=>ll.name === parent)).find(xx=>xx !== undefined);
+							let what = cats.map(xx=>xx.subCategories!.find(ll=>ll.name === parent)).find(xx=>xx !== undefined);
 							if (what)
 							{
-								what.subCategories.push(cat);
+								what.subCategories!.push(cat);
 							}
 						}
 					}
@@ -104,15 +111,16 @@ export default class CrawlerService
 		if (productHtml)
 		{
 			let DD = cheerio.load(productHtml);
-			let prod:Product = {
+			let prod:Product = new ProductModel({
 				title:"",
 				priceHuf:0,
 				productNumber:0,
-				category:"",
+				categoryId:"",
 				description:"",
 				stockState:"other",
 				silverUrl:encodeURI(href)
-			};
+			});
+			
 			DD("#body>h2>em").each((ii,doc)=>{
 				if (prod.title === "")
 				{
@@ -236,34 +244,34 @@ export default class CrawlerService
 			atPage++;
 		}
 
-		return [ ];
+		return prods;
 	}
 
 	public async doCrawl()
 	{
 		console.log("Start crawl.")
 		let categoriesCol = await this.crawlCategories();
-		DataRepository.saveCategories(categoriesCol);
+		let didWipe = await this._categoryRepository.wipeCategories();
+		
+		await this._categoryRepository.bulkAddCategory(categoriesCol.flat);
 
-		let productsCol:ProductsCollection = DataRepository.getProductsCollection();
-		let progress = DataRepository.getCrawlProgress();
+		let progress = await this._crawlProgressRepository.getActiveProgress();
 
-		for (let ii = progress.atCatIndex; ii < categoriesCol.flat.length;ii++)
+		for (let ii = progress.atCategoryIndex; ii < categoriesCol.flat.length;ii++)
 		{
 			let thisCat = categoriesCol.flat[ii];
 			console.log(thisCat.name, " at cat ",ii," / ",categoriesCol.flat.length);
 			if (thisCat.productsLink !== "#")
 			{
 				let productsInThisCat = await this.crawlProducts(categoriesCol.flat[ii].productsLink);
-				productsInThisCat.forEach(xx=>xx.category = thisCat.id);
-				productsCol.byCategory[thisCat.id] = productsInThisCat;
+				productsInThisCat.forEach(xx=>xx.categoryId = thisCat._id.toHexString());
+				await this._productRepository.bulkAddProduct(productsInThisCat);
 			}
-			DataRepository.saveProducts(productsCol);
-			progress.atCatIndex = ii+1;
-			DataRepository.saveCrawlProgress(progress);
+			
+			progress.atCategoryIndex = ii+1;
+			await this._crawlProgressRepository.updateCrawlProgress(progress);
 		}
 
-		DataRepository.saveProducts(productsCol);
 		console.log("saved everything");
 	}
 

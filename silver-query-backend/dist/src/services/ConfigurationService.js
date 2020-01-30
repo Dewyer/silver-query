@@ -12,19 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var tsyringe_1 = require("tsyringe");
-var config_json_1 = __importDefault(require("../../config.json"));
-var ConfigurationService = /** @class */ (function () {
-    function ConfigurationService() {
+const tsyringe_1 = require("tsyringe");
+const config_json_1 = __importDefault(require("../../config.json"));
+let ConfigurationService = class ConfigurationService {
+    constructor() {
     }
-    ConfigurationService.prototype.getConfiguration = function () {
+    getConfiguration() {
         return config_json_1.default;
-    };
-    ConfigurationService = __decorate([
-        tsyringe_1.injectable(),
-        __metadata("design:paramtypes", [])
-    ], ConfigurationService);
-    return ConfigurationService;
-}());
+    }
+};
+ConfigurationService = __decorate([
+    tsyringe_1.injectable(),
+    __metadata("design:paramtypes", [])
+], ConfigurationService);
 exports.default = ConfigurationService;
 //# sourceMappingURL=ConfigurationService.js.map
