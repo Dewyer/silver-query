@@ -1,0 +1,18 @@
+@import "../../../styles/mixins.scss";
+@import "../../../styles/palette.scss";
+
+/*NavListItem View Styles*/
+
+.item
+{
+	text-decoration: none;
+	color:$Jet;
+	font-size: 1.3rem;
+	@include fancyText();
+
+	&:hover
+	{
+		color:lighten($color: $Jet, $amount: 50);
+		text-decoration: underline;
+	}
+}

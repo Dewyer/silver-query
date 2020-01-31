@@ -21,12 +21,10 @@ process.env.OVERNIGHT_LOGGER_RM_TIMESTAMP = 'false';
 import NormalRouterServer from './NormalRouterServer';
 import { container } from 'tsyringe';
 import MainDatabaseContext from './data/MainDatabaseContext';
-import DatabaseSeeder from './data/seeder';
 
 let server = new NormalRouterServer();
 
 let dbContext = container.resolve(MainDatabaseContext);
-import "./configureAuth";
 
 dbContext.initDb().then(successDb=>{
 
@@ -35,8 +33,6 @@ dbContext.initDb().then(successDb=>{
         console.log("Can't connect to the database failed to start");
         process.exit(1);
     }
-    //seed
-    DatabaseSeeder.seed(dbContext);
     
     server.start(3000);
 });

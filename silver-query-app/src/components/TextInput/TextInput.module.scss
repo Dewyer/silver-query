@@ -1,0 +1,21 @@
+@import "../../styles/mixins.scss";
+@import "../../styles/palette.scss";
+
+/*TextInput View Styles*/
+
+.input
+{
+	outline: none;
+	border: none;
+	font-size: 1rem;
+	border: 1px solid $Jet;
+	padding: 0.2rem;
+	border-radius: 3px;
+	@include normalText();
+
+	&:focus
+	{
+		border-color: $Yonder;
+
+	}
+}

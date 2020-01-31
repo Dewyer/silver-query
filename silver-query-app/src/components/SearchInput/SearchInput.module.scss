@@ -1,0 +1,15 @@
+@import "../../styles/palette.scss";
+
+/*SearchInput View Styles*/
+
+.search
+{
+	width: 11rem;
+	border-radius: 0.7rem !important;
+	padding: 0.2rem 0.7rem !important;
+
+	&:focus
+	{
+		border:2px solid $Carmine !important;
+	}
+}

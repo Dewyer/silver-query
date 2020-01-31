@@ -3,6 +3,8 @@ import * as controllers from './controllers';
 import { Server } from '@overnightjs/core';
 import { Logger } from '@overnightjs/logger';
 import errorMiddleware from './middleware/error';
+import express from "express";
+import path from "path";
 
 class NormalRouterServer extends Server {
 
@@ -14,7 +16,11 @@ class NormalRouterServer extends Server {
         super(true);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use("/",express.static("public"));
         this.setupControllers();
+        this.app.get("*",(req,res)=>{
+            res.sendFile(process.cwd()+'/public/index.html'); 
+        })
         this.app.use(errorMiddleware);
     }
 

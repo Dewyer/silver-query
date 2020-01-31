@@ -1,0 +1,24 @@
+@import "../../styles/palette.scss";
+@import "../../styles/mixins.scss";
+
+/*ContentWrapper View Styles*/
+
+.container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-direction: column;
+	height: 100vh;
+}
+
+.contentWrapper {
+	width: 90%;
+	min-height: 70vh;
+	background-color: rgba(255, 255, 255,0.8);
+	box-sizing: border-box;
+	margin: 2rem 2rem;
+	border-radius: 1rem;
+	box-sizing: border-box;
+	padding: 1rem;
+	@include boxShadow();
+}

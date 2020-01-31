@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "compile": "tsc",
-    "debug": "yarn compile&&node ./dist/src/index.js",
+    "debug": "yarn compile&&node ./dist/src/server.js",
     "debug-build": "tsc"
   },
   "dependencies": {

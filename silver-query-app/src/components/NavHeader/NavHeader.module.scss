@@ -1,0 +1,51 @@
+@import "../../styles/palette.scss";
+@import "../../styles/mixins.scss";
+
+/*NavHeader View Styles*/
+
+.container {
+	box-sizing: border-box;
+	width: 100vw;
+	height: 4rem;
+	background-color: $Platinum;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.7rem 0.7rem;
+}
+
+.infoContainer
+{
+	background-color: white;
+	padding: 0.4rem;
+	font-size: 0.9rem;
+	letter-spacing: 0.1rem;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.leftPartContainer {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-direction: row;
+
+	& > img {
+		height: 2rem;
+	}
+
+	& > span {
+		@include fancyText();
+		color:$Carmine;
+		font-size: 1.5rem;
+	}
+}
+
+.wrapper
+{
+	@include boxShadow();
+
+}

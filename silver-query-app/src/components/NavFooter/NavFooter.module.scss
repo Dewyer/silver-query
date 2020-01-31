@@ -1,0 +1,12 @@
+@import "../../styles/palette.scss";
+@import "../../styles/mixins.scss";
+
+/*NavFooter View Styles*/
+
+.container
+{
+	width: 100vw;
+	box-sizing: border-box;
+	padding: 0.4rem;
+	background-color: $Platinum;
+}
