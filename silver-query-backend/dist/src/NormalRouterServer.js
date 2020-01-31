@@ -41,7 +41,7 @@ class NormalRouterServer extends core_1.Server {
         super.addControllers(controllerInstances);
     }
     start(port) {
-        port = port || 3000;
+        port = port || 4200;
         this.app.get('*', (req, res) => {
             res.send(this.FRONT_END_MSG);
         });

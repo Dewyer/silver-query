@@ -38,7 +38,7 @@ class NormalRouterServer extends Server {
 
 
     public start(port?: number): void {
-        port = port || 3000;
+        port = port || 4200;
         this.app.get('*', (req, res) => {
             res.send(this.FRONT_END_MSG);
         });

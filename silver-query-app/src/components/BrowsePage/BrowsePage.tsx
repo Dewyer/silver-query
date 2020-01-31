@@ -1,19 +1,17 @@
 import React from 'react';
-import styles from "./BrowsePage.module.scss"
-
-export interface Props
-{
-
-}
+import styles from "./BrowsePage.module.scss";
+import { RouteComponentProps } from "react-router-dom";
+import BrowseFilters from '../BrowseFilters';
+import ProductList from '../ProductList';
 
 export interface State
 {
 
 }
 
-class BrowsePage extends React.Component<Props,State>
+class BrowsePage extends React.Component<RouteComponentProps,State>
 {
-	constructor(props:Props)
+	constructor(props: RouteComponentProps)
 	{
 		super(props);
 
@@ -22,9 +20,36 @@ class BrowsePage extends React.Component<Props,State>
 		};
 	}
 
-	render(){
+	historyListenerStop:any;
+
+	componentDidMount()
+	{
+		this.historyListenerStop = this.props.history.listen((a,b)=>{
+			console.log(a);
+			this.updateQueryParams();
+		});
+
+		this.updateQueryParams();
+	}
+
+	componentWillUnmount()
+	{
+		this.historyListenerStop();
+	}
+
+	updateQueryParams()
+	{
+		let url = new URLSearchParams(window.location.href);
+		console.log(window.location.href);
+	}
+
+	render()
+	{
 		return (
-			<p>Look at my wares.</p>
+			<div>
+				<BrowseFilters />
+				<ProductList />
+			</div>
 		);
 	}
 }
