@@ -22,7 +22,7 @@
     "@types/reflect-metadata": "^0.1.0",
     "cheerio": "^1.0.0-rc.3",
     "mongoose": "^5.8.10",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.0.1",
     "@hasezoey/typegoose": "^5.9.1",
